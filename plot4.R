@@ -1,0 +1,36 @@
+## assumes you've downloaded and unzipped the file in your working directory.
+
+## read, subset and clean data
+pdata <- read.table("household_power_consumption.txt", header=TRUE, sep=";")
+pdata$powerDate <- as.Date(pdata$powerDate, format="%d/%m/%Y")  ## convert dates
+pdata <- subset(pdata, powerDate=="2007-02-01" | powerDate=="2007-02-02")  ## subset data
+
+pdata$Time <- as.character(pdata$Time)  ## convert times.
+dateTime <- as.POSIXct(paste(pdata$powerDate, pdata$Time), format("%Y%m%d %H:%M:%S"))
+
+
+## Plot of Graph 4 and write to png file
+png(filename="plot4.png")
+par(mfrow=c(2,2))   ## sets up 4 plots in the window.
+
+## 1st plot
+with(pdata, plot(x=dateTime, y=as.numeric(Global_active_power)/500, main = "", xlab="", ylab="Global Active Power", type="l"))
+
+## 2nd plot
+with(pdata, plot(x=dateTime, y=as.numeric(Voltage)/8, main = "", xlab="datetime", ylab="Voltage", type="l"))
+
+## 3rd plot
+with(pdata, plot(x=dateTime, y=as.numeric(Sub_metering_1), main = "", xlab="", ylab="Energy sub metering", type="l"))
+with(pdata, lines(x=dateTime, y=as.numeric(Sub_metering_2), col="red", type='l'))
+with(pdata, lines(x=dateTime, y=as.numeric(Sub_metering_3), col="blue", type='l'))
+legend("topright", col=c("black", "red", "blue"), c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"), lty=c(1,1), bty="n")
+
+## 4th plot
+with(pdata, plot(x=dateTime, y=as.numeric(Global_reactive_power)/500, 
+        main = "", 
+        xlab = "datetime",
+        ylab = "Global_Reactive_Power",
+        type="l"))
+
+dev.off()
+
